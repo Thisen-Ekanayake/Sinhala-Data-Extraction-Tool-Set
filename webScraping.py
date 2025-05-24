@@ -1,4 +1,4 @@
-import requests
+import requests 
 from bs4 import BeautifulSoup
 import os
 import json
@@ -6,9 +6,11 @@ import time
 import random
 
 # === CONFIG ===
-START_ID = 10001
-END_ID = 10010  # change this to scrape more
-SAVE_DIR = "adaderana_articles"
+START_ID = 15111
+END_ID = 16110  # update this to scrape more
+BATCH_SIZE = 100
+DELAY_BETWEEN_BATCHES = 300  # 10 minutes
+SAVE_DIR = "adaderana_articles_1000"
 HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
 # === Setup ===
@@ -58,7 +60,12 @@ def scrape_article(article_id):
 
     print(f"[{article_id}] ✔️ Saved")
 
-# === Run Scraper with polite delays ===
-for article_id in range(START_ID, END_ID + 1):
+# === Run Scraper with batching and polite delays ===
+for i, article_id in enumerate(range(START_ID, END_ID + 1), start=1):
     scrape_article(article_id)
-    time.sleep(random.uniform(1.5, 3.5))  # polite random delay between requests
+    time.sleep(random.uniform(2, 4))  # polite delay between articles
+
+    # Pause after each batch
+    if i % BATCH_SIZE == 0 and article_id != END_ID:
+        print(f"\n🕒 Batch complete. Waiting {DELAY_BETWEEN_BATCHES // 60} minutes before next batch...\n")
+        time.sleep(DELAY_BETWEEN_BATCHES)
